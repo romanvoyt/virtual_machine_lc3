@@ -371,14 +371,14 @@ int main(int argc, char const *argv[])
                 break;
             case OP_TRAP:
                 {
-
+                    //trap routines
                 }
                 break;
             case OP_RES:
             case OP_RTI:
             default:
                 {
-                    
+                    // bad opcode
                 }
                 break;
         }
