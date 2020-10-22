@@ -410,7 +410,9 @@ int main(int argc, char const *argv[])
                             while (*c)
                             {
                                 putc((char)*c & 0xFF, stdout);
-                                putc((char)*c>>8 & 0xFF, stdout);
+                                if((char)*c>>8 & 0xFF){
+                                    putc((char)*c>>8 & 0xFF, stdout);
+                                }
                                 ++c;
                             }
                             fflush(stdout);
@@ -432,16 +434,12 @@ int main(int argc, char const *argv[])
             default:
                 {
                     // bad opcode
+                    abort();
                 }
                 break;
         }
-
+        /*shutdown*/
+        restore_input_buffering();
     }
-
     return 0;
 }
-
-
-
-
-
