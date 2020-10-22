@@ -364,7 +364,7 @@ int main(int argc, char const *argv[])
 				{	
 					uint16_t sr = (instr >> 9) & 0x7;
                     uint16_t base_r = (instr >> 9) & 0x7;
-                    uint16_t pc_offset6 = sign_extend(instr & 0x3F, 9);
+                    uint16_t pc_offset6 = sign_extend(instr & 0x3F, 6);
 
                     mem_write(registers[base_r] + pc_offset6, registers[sr]);
 				}
@@ -406,14 +406,22 @@ int main(int argc, char const *argv[])
                         break;
                     case TRAP_PUTSP:
                         {
+                            uint16_t* c = memory + registers[R_R0];
+                            while (*c)
+                            {
+                                putc((char)*c & 0xFF, stdout);
+                                putc((char)*c>>8 & 0xFF, stdout);
+                                ++c;
+                            }
+                            fflush(stdout);
                             
                         }
                     case TRAP_HALT:
                         {
-
+                            puts("HALT.");
+                            fflush(stdout);
+                            running = 0;
                         }
-                        break;
-                    default:
                         break;
                     }
 
