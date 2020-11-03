@@ -284,6 +284,20 @@ int main(int argc, char const *argv[])
                 break;
             case OP_JSR:
                 {
+                    uint16_t long_flag = (instr >> 11) & 1;
+                    registers[R_R7] = registers[R_PC];
+                    if (long_flag)
+                    {
+                        uint16_t long_pc_offset = sign_extend(instr & 0x7FF, 11);
+                        registers[R_PC] += long_pc_offset;  /* JSR */
+                    }
+                    else
+                    {
+                        uint16_t r1 = (instr >> 6) & 0x7;
+                        registers[R_PC] = registers[r1]; /* JSRR */
+                    }
+                    break;
+                    /*
 					uint16_t long_flag = (instr >> 11) & 0x1;
 					uint16_t base_r = (instr >> 6) & 0x7;
 					uint16_t pc_offset11 = sign_extend(instr & 0x7FFF, 11);
@@ -291,12 +305,13 @@ int main(int argc, char const *argv[])
 					registers[R_R7] = registers[R_PC];
 
 					if (long_flag == 0) {
-						registers[R_PC] = registers[base_r]; /* JSRR */
+						registers[R_PC] = registers[base_r]; 
 					}
 					else
 					{
-						registers[R_PC] = registers[R_PC] + pc_offset11; /* JSR */
+						registers[R_PC] = registers[R_PC] + pc_offset11; 
 					}
+                    */
 					
 				}
                 break;
@@ -313,9 +328,9 @@ int main(int argc, char const *argv[])
             case OP_LDI:
                 {
                     uint16_t r0 = (instr >> 9) & 0x7;
-                    uint16_t pc_offset9 = instr & 0x1FF;
+                    uint16_t pc_offset9 = sign_extend(instr & 0x1FF, 9);
 
-                    registers[r0] = mem_read(registers[R_PC] + sign_extend(pc_offset9, 9));
+                    registers[r0] = mem_read(registers[R_PC] + pc_offset9);
 
                     update_flags(r0);
                 }
@@ -360,7 +375,7 @@ int main(int argc, char const *argv[])
             case OP_STR:
 				{	
 					uint16_t sr = (instr >> 9) & 0x7;
-                    uint16_t base_r = (instr >> 9) & 0x7;
+                    uint16_t base_r = (instr >> 6) & 0x7;
                     uint16_t pc_offset6 = sign_extend(instr & 0x3F, 6);
 
                     mem_write(registers[base_r] + pc_offset6, registers[sr]);
@@ -406,11 +421,16 @@ int main(int argc, char const *argv[])
                             uint16_t* c = memory + registers[R_R0];
                             while (*c)
                             {
-                                putc((char)*c & 0xFF, stdout);
+                                char char1 = (*c) & 0xFF;
+                                putc(char1, stdout);
+                                char char2 = (*c) >> 8;
+                                if (char2) putc(char2, stdout);
+                                ++c;
+                                /*putc((char)*c & 0xFF, stdout);
                                 if((char)*c>>8 & 0xFF){
                                     putc((char)*c>>8 & 0xFF, stdout);
                                 }
-                                ++c;
+                                ++c;*/
                             }
                             fflush(stdout);
                             
